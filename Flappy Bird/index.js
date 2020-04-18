@@ -20,9 +20,9 @@ let bird = new Bird(canvas);
 
 //Listening to the keydown event to make jump
 
-document.addEventListener("keydown", function () {
-    bird.up(0 + Bird.birdImg.height , canvas.height - base.height)
-})
+// document.addEventListener("keydown", function () {
+//     bird.up(0 + Bird.birdImg.height , canvas.height - base.height)
+// })
 
 
 
@@ -38,7 +38,7 @@ function draw() {
     for (let pipe of pipes) {
         pipe.draw(ctx);
         pipe.update();
-        if (pipe.isHit(bird,Bird.birdImg.width , Bird.birdImg.height ,canvas.height -base.height )) {
+        if (pipe.isHit(bird, Bird.birdImg.width, Bird.birdImg.height, canvas.height - base.height)) {
         }
 
         if (pipe.x === 60) {
@@ -47,6 +47,9 @@ function draw() {
 
 
     }
+
+    //making the bird think on it's own.
+    bird.think(pipes);
 
     bird.draw(ctx);
     //updating the gravity

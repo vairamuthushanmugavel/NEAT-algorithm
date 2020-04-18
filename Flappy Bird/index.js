@@ -33,14 +33,20 @@ function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     //drawing the background Image.
     ctx.drawImage(background, 0, 0);
-    pipes = pipes.filter(pipe => pipe.x > - 52);
+    pipes = pipes.filter(pipe => pipe.x > - 100);
 
     for (let pipe of pipes) {
         pipe.draw(ctx);
         pipe.update();
+        if (pipe.isHit(bird,Bird.birdImg.width , Bird.birdImg.height ,canvas.height -base.height )) {
+            console.log("collison");
+        }
+
         if (pipe.x === 60) {
             pipes.push(new Pipe(canvas));
         }
+
+
     }
 
     bird.draw(ctx);

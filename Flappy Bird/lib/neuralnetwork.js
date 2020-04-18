@@ -1,29 +1,45 @@
 function sigmoid(x) {
   return 1 / (1 + Math.exp(-x));
 }
-function dsigmod(y){
- return (y * (1 - y));
+function dsigmod(y) {
+  return (y * (1 - y));
 }
 
 class NeuralNetwork {
-  constructor(inputcount, hiddencount, outputcount) {
-    this.inputcount = inputcount;
-    this.hiddencount = hiddencount;
-    this.outputcount = outputcount;
-    //inititalizing the weights
-    //initializing weights between input node and hidden node.
-    this.weights_ih = new Matrix(this.hiddencount, this.inputcount);
-    this.weights_ih.randomize();
-    //initializing the weights between output node and hidden node.
-    this.weights_ho = new Matrix(this.outputcount, this.hiddencount);
-    this.weights_ho.randomize();
-    //bias for hiddde node
-    this.bias_h = new Matrix(this.hiddencount, 1);
-    this.bias_h.randomize();
-    //bias for output node.
-    this.bias_o = new Matrix(this.outputcount, 1);
-    this.bias_o.randomize();
-    this.learningrate = 0.1
+  constructor(inputcount, hiddencount, outputcount, context) {
+    if (context instanceof NeuralNetwork) {
+
+      this.inputcount = context.inputcount;
+      this.hiddencount = context.hiddencount;
+      this.outputcount = context.outputcount;
+      //copying the weights from the incoming contect
+      this.weights_ih = context.weights_ih.copy();
+      this.weights_ho = context.weights_ho.copy();
+      //copying the bias from incoming context
+      this.bias_h = context.bias_h.copy();
+      this.bias_o = context.bias_o.copy();
+
+    } else {
+
+
+      this.inputcount = inputcount;
+      this.hiddencount = hiddencount;
+      this.outputcount = outputcount;
+      //inititalizing the weights
+      //initializing weights between input node and hidden node.
+      this.weights_ih = new Matrix(this.hiddencount, this.inputcount);
+      this.weights_ih.randomize();
+      //initializing the weights between output node and hidden node.
+      this.weights_ho = new Matrix(this.outputcount, this.hiddencount);
+      this.weights_ho.randomize();
+      //bias for hiddde node
+      this.bias_h = new Matrix(this.hiddencount, 1);
+      this.bias_h.randomize();
+      //bias for output node.
+      this.bias_o = new Matrix(this.outputcount, 1);
+      this.bias_o.randomize();
+      this.learningrate = 0.1
+    }
   }
   feedForward(inputs) {
     //coverting the input into array
@@ -73,8 +89,8 @@ class NeuralNetwork {
     //Activation function
     output.map(sigmoid);
 
-    
-    
+
+
     //calculating the output error
     //error =  target - error
     let output_errors = Matrix.substract(targets, output);
@@ -82,34 +98,57 @@ class NeuralNetwork {
     let weights_ho_t = Matrix.transpose(this.weights_ho);
     //calculting the hidden error
     let hidden_errors = Matrix.multiply(weights_ho_t, output_errors);
-     
 
-  //calculating the gradients for hidden layer to output layer 
-    let outputgradient =  Matrix.map(output,dsigmod);
+
+    //calculating the gradients for hidden layer to output layer 
+    let outputgradient = Matrix.map(output, dsigmod);
     //multiplying the output error
     outputgradient.multiply(output_errors);
     //multiplying with learnign rate 
     outputgradient.multiply(this.learningrate);
     //multiplying with hidden output with tranposed
     let hidden_t = Matrix.transpose(hiddenoutput);
-    let deltaweight_ho = Matrix.multiply(outputgradient,hidden_t);
+    let deltaweight_ho = Matrix.multiply(outputgradient, hidden_t);
     //correction the weights between hidden to output
     this.weights_ho.add(deltaweight_ho);
     //adjusting the bias of output layer
     this.bias_o.add(outputgradient);
 
     //calculatin the gradients between input to hidden layer
-    let inputgradient = Matrix.map(hiddenoutput,dsigmod);
+    let inputgradient = Matrix.map(hiddenoutput, dsigmod);
     //multiplying with hidden error 
     inputgradient.multiply(hidden_errors);
     //multiplying with learning rate
     inputgradient.multiply(this.learningrate);
     let input_t = Matrix.transpose(inputs);
     //delta weight for input layer to hidden layer.
-    let deltaweight_ih = Matrix.multiply(inputgradient,input_t);
+    let deltaweight_ih = Matrix.multiply(inputgradient, input_t);
     this.weights_ih.add(deltaweight_ih);
     //adjusting the bias of hidden layer
-    this.bias_h.add(inputgradient);  
-    
+    this.bias_h.add(inputgradient);
+
   }
+
+  //adding function for neuro Evolution.
+  copy() {
+    return new NeuralNetwork('','','',this)
+  }
+
+  mutate(rate) {
+    function change(val){
+      let prob = Math.random();
+      if (prob < rate) {
+        return Math.random() * 2 - 1;
+      } else {
+        return val;
+      }
+
+    }
+    this.weights_ih.map(change);
+    this.weights_ho.map(change);
+    this.bias_h.map(change);
+    this.bias_o.map(change);
+
+  }
+
 }

@@ -22,6 +22,21 @@ class Matrix {
       }
     }
   }
+  /**
+   * @description give a clone of current matrix.
+   * @returns Matrix 
+   *  */
+
+  copy() {
+    let result = new Matrix(this.rows, this.cols);
+    for (let row = 0; row < this.rows; row++) {
+      for (let col = 0; col < this.cols; col++) {
+        result.data[row][col] = this.data[row][col];
+      }
+    }
+    return result;
+  }
+
 
   multiply(matrix) {
     if (matrix instanceof Matrix) {

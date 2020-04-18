@@ -21,7 +21,7 @@ let bird = new Bird(canvas);
 //Listening to the keydown event to make jump
 
 document.addEventListener("keydown", function () {
-    bird.up(0, canvas.height - base.height)
+    bird.up(0 + Bird.birdImg.height , canvas.height - base.height)
 })
 
 
@@ -39,7 +39,6 @@ function draw() {
         pipe.draw(ctx);
         pipe.update();
         if (pipe.isHit(bird,Bird.birdImg.width , Bird.birdImg.height ,canvas.height -base.height )) {
-            console.log("collison");
         }
 
         if (pipe.x === 60) {
